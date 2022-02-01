@@ -7,22 +7,26 @@ USER_NAME = 'postgres'
 PASSWORD = password()
 PORT_ID = 5432
 
-database = psycopg2.connect(
+conn = psycopg2.connect(
     host=HOST_NAME,
     dbname=DATABASE,
     user=USER_NAME,
     password=PASSWORD,
     port=PORT_ID
 )
-sql = database.cursor()
+cur = conn.cursor()
 
-create_table = '''      CREATE TYPE genders AS ENUM (
+extension = '''
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+'''
+
+gender_type = '''       CREATE TYPE genders AS ENUM (
                         'F', 'M');
-                        
-                        CREATE playable AS ENUM (
+'''
+play_type = '''         CREATE TYPE playable AS ENUM (
                         'NPC', 'Player');
-                        
-                        CREATE traditions AS ENUM (
+'''
+tradition_type = '''    CREATE TYPE traditions AS ENUM (
                         'Akashic Brotherhood',
                         'Celestial Chorus',
                         'Cult of Ecstasy',
@@ -33,28 +37,28 @@ create_table = '''      CREATE TYPE genders AS ENUM (
                         'Verbena',
                         'Virtual Adepts',
                         'Technocracy');
-                        
-                        CREATE TYPE martial AS ENUM (
+'''
+martial_type = '''      CREATE TYPE martial AS ENUM (
                         'Married', 'Widowed',
                         'Separated', 'Divorced',
                         'Single');
-                        
-                        CREATE TYPE bloods AS ENUM (
+'''
+blood_type = '''        CREATE TYPE bloods AS ENUM (
                         'A+', 'A-',
                         'B+', 'B-',
                         'AB+', 'AB-',
                         'O+', 'O-');
-                        
-                        CREATE TYPE orientation AS ENUM (
+'''
+orientation_type = '''  CREATE TYPE orientation AS ENUM (
                         'Lesbian', 'Gay', 'Bisexual', 'Pansexual',
                         'Asexual','Non-binary', 'Straight');
-                        
-                        CREATE countries AS ENUM (
+'''
+country_type = '''      CREATE TYPE countries AS ENUM (
                         'Angola', 'Argentina', 'Armenia', 'Australia',
                         'Bahamas', 'Bangladesh', 'Bolivia', 'Brazil',
                         'Canada', 'Chile', 'China', 'Ecuador',
                         'Egypt', 'Finland', 'France', 'Germany',
-                        'Greece', 'Guinea', 'Hungary' 'India',
+                        'Greece', 'Guinea', 'Hungary', 'India',
                         'Indonesia', 'Italy', 'Jamaica', 'Japan',
                         'Malaysia', 'Maldives', 'Mexico', 'Monaco',
                         'Morocco', 'Netherlands', 'New Zealand', 'Nigeria',
@@ -64,9 +68,9 @@ create_table = '''      CREATE TYPE genders AS ENUM (
                         'Spain', 'Sweden', 'Switzerland', 'Taiwan',
                         'Thailand', 'Ukraine', 'United Kingdom', 'United States',
                         'Uruguay');
-
-                        CREATE TABLE IF NOT EXISTS mage (
-                        id              uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+'''
+mage_table = '''        CREATE TABLE IF NOT EXISTS mage (
+                        mage_id         uuid DEFAULT uuid_generate_v4(),
                         name            varchar(56) NOT NULL,
                         gender          genders NOT NULL,
                         sexuality       orientation NOT NULL,
@@ -78,10 +82,11 @@ create_table = '''      CREATE TYPE genders AS ENUM (
                         tradition       traditions NOT NULL,
                         character       playable NOT NULL,
                         creator         varchar(56) NOT NULL,
+                        PRIMARY KEY (mage_id)
                         );
-                        
 '''
-sql.execute(create_table)
+cur.execute(mage_table)
+conn.commit()
 
-sql.close()
-database.close()
+cur.close()
+conn.close()
