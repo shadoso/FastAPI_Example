@@ -1,0 +1,63 @@
+gender_type = '''       CREATE TYPE genders AS ENUM (
+                        'F', 'M');
+'''
+play_type = '''         CREATE TYPE playable AS ENUM (
+                        'NPC', 'Player');
+'''
+tradition_type = '''    CREATE TYPE traditions AS ENUM (
+                        'Akashic Brotherhood',
+                        'Celestial Chorus',
+                        'Cult of Ecstasy',
+                        'Dreamspeakers',
+                        'Euthanatos',
+                        'Order of Hermes',
+                        'Sons of Ether',
+                        'Verbena',
+                        'Virtual Adepts',
+                        'Technocracy');
+'''
+martial_type = '''      CREATE TYPE martial AS ENUM (
+                        'Married', 'Widowed',
+                        'Separated', 'Divorced',
+                        'Single');
+'''
+blood_type = '''        CREATE TYPE bloods AS ENUM (
+                        'A+', 'A-',
+                        'B+', 'B-',
+                        'AB+', 'AB-',
+                        'O+', 'O-');
+'''
+orientation_type = '''  CREATE TYPE orientation AS ENUM (
+                        'Lesbian', 'Gay', 'Bisexual', 'Pansexual',
+                        'Asexual','Non-binary', 'Straight');
+'''
+country_type = '''      CREATE TYPE countries AS ENUM (
+                        'Angola', 'Argentina', 'Armenia', 'Australia',
+                        'Bahamas', 'Bangladesh', 'Bolivia', 'Brazil',
+                        'Canada', 'Chile', 'China', 'Ecuador',
+                        'Egypt', 'Finland', 'France', 'Germany',
+                        'Greece', 'Guinea', 'Hungary', 'India',
+                        'Indonesia', 'Italy', 'Jamaica', 'Japan',
+                        'Malaysia', 'Maldives', 'Mexico', 'Monaco',
+                        'Morocco', 'Netherlands', 'New Zealand', 'Nigeria',
+                        'Paraguay', 'Peru', 'Philippines', 'Poland',
+                        'Portugal', 'Romania', 'Russian Federation', 'Senegal',
+                        'Singapore', 'Slovakia', 'Slovenia', 'Somalia',
+                        'Spain', 'Sweden', 'Switzerland', 'Taiwan',
+                        'Thailand', 'Ukraine', 'United Kingdom', 'United States',
+                        'Uruguay');
+'''
+mage_table = '''              CREATE TABLE IF NOT EXISTS mage (
+                        id              uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+                        name            varchar(56) NOT NULL,
+                        gender          genders NOT NULL,
+                        sexuality       orientation NOT NULL,
+                        country         countries NOT NULL,
+                        age             int NOT NULL,
+                        job             varchar(32) NOT NULL,
+                        blood           bloods NOT NULL,
+                        relationship    martial NOT NULL,
+                        tradition       traditions NOT NULL,
+                        character       playable NOT NULL,
+                        creator         varchar(56) NOT NULL);
+'''
