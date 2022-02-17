@@ -1,7 +1,7 @@
 from enum import Enum
 from uuid import UUID, uuid4
 from pydantic import BaseModel
-from typing import Optional, Set
+from typing import Optional, List
 
 
 class Gender(str, Enum):
@@ -26,6 +26,12 @@ class Courses(str, Enum):
     psyc = "Psychology"
 
 
+class Scholarship(float, Enum):
+    full = 1.00
+    half = 0.50
+    quarter = 0.25
+
+
 class Disability(str, Enum):
     mobility = "Mobility impairment"
     eyesight = "Eyesight impairment"
@@ -35,14 +41,17 @@ class Disability(str, Enum):
 
 
 class User(BaseModel):
-    id: Optional[UUID] = uuid4()
+    uid: Optional[UUID] = uuid4()
     name: str
     gender: Gender
     role: Role
-    course: Set[Courses] = None
-    disabilities: Optional[Set[Disability]] = None
+    course: Optional[List[Courses]] = None
+    salary: Optional[float] = None
+    monthly_payment: Optional[float] = None
+    scholarship: Optional[Scholarship] = None
+    disabilities: Optional[List[Disability]] = None
 
 
 class UpdateInfo(BaseModel):
     role: Role
-    course: Set[Courses]
+    course: List[Courses]
