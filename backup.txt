@@ -1,3 +1,12 @@
+mage_type = '''
+                        CREATE TYPE reality AS ENUM (
+                        'Sleeper', 'Awakened');
+'''
+
+extension = '''
+                        CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+'''
+
 gender_type = '''       CREATE TYPE genders AS ENUM (
                         'F', 'M');
 '''
@@ -16,7 +25,7 @@ tradition_type = '''    CREATE TYPE traditions AS ENUM (
                         'Virtual Adepts',
                         'Technocracy');
 '''
-martial_type = '''      CREATE TYPE martial AS ENUM (
+relationship_type = ''' CREATE TYPE relationship AS ENUM (
                         'Married', 'Widowed',
                         'Separated', 'Divorced',
                         'Single');
@@ -27,7 +36,7 @@ blood_type = '''        CREATE TYPE bloods AS ENUM (
                         'AB+', 'AB-',
                         'O+', 'O-');
 '''
-orientation_type = '''  CREATE TYPE orientation AS ENUM (
+sexuality_type = '''    CREATE TYPE sexuality AS ENUM (
                         'Lesbian', 'Gay', 'Bisexual', 'Pansexual',
                         'Asexual','Non-binary', 'Straight');
 '''
@@ -47,17 +56,104 @@ country_type = '''      CREATE TYPE countries AS ENUM (
                         'Thailand', 'Ukraine', 'United Kingdom', 'United States',
                         'Uruguay');
 '''
-mage_table = '''              CREATE TABLE IF NOT EXISTS mage (
-                        id              uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+mage_table = '''        CREATE TABLE IF NOT EXISTS mage (
+                        mage_id         uuid DEFAULT uuid_generate_v4(),
                         name            varchar(56) NOT NULL,
                         gender          genders NOT NULL,
-                        sexuality       orientation NOT NULL,
+                        sexuality       sexuality NOT NULL,
                         country         countries NOT NULL,
                         age             int NOT NULL,
                         job             varchar(32) NOT NULL,
                         blood           bloods NOT NULL,
-                        relationship    martial NOT NULL,
-                        tradition       traditions NOT NULL,
+                        relationship    relationship NOT NULL,
+                        reality         reality NOT NULL,
+                        tradition       traditions,
+                        avatar          varchar(56),
                         character       playable NOT NULL,
-                        creator         varchar(56) NOT NULL);
+                        description     varchar(512),
+                        story           varchar(2560),
+                        creator         varchar(56) NOT NULL,
+                        PRIMARY KEY (mage_id)
+                        );
 '''
+
+
+
+
+import psycopg2
+
+HOST_NAME = 'localhost'
+DATABASE = 'WOD'
+USER_NAME = 'postgres'
+PASSWORD = 'shadobot'
+PORT_ID = 5432
+
+conn = psycopg2.connect(
+    host=HOST_NAME,
+    dbname=DATABASE,
+    user=USER_NAME,
+    password=PASSWORD,
+    port=PORT_ID
+)
+cur = conn.cursor()
+
+mage = 'INSERT INTO mage (name, gender, sexuality, country, age, job, blood, relationship, reality, avatar, ' \
+       'character, creator) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+mage_values = [('Oliver Owen Thierry', 'M', 'Straight', 'United States', 35, 'CEO Bell Hill',
+                'O+', 'Single', 'Awakened', 'Money', 'Player', 'Shadoso'),
+               ('Abigail Collins String', 'F', 'Bisexual', 'Canada', 23, 'Tattoo Artist',
+                'A+', 'Single', 'Awakened', 'Ink', 'Player', 'Shadoso'),
+               ('Taylor Collins String', 'M', 'Gay', 'Canada', 15, 'Student',
+                'A+', 'Single', 'Awakened', 'Chips', 'NPC', 'Shadoso')
+               ]
+for insert in mage_values:
+    cur.execute(mage, insert)
+
+conn.commit()
+
+cur.close()
+conn.close()
+
+
+
+import psycopg2
+import psycopg2.extras
+
+HOST_NAME = 'localhost'
+DATABASE = 'College'
+USER_NAME = 'postgres'
+PASSWORD = 'shadobot'
+PORT_ID = 5432
+
+DROP = '''         DROP TABLE users
+'''
+EXTENSION = '''    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+'''
+TABLE = '''        CREATE TABLE IF NOT EXISTS users (
+                        user_uid        uuid,
+                        name            varchar(56) NOT NULL,
+                        gender          text NOT NULL,
+                        role            text,
+                        course          text[],
+                        salary          numeric (8, 2),
+                        monthly_payment numeric (6, 2),
+                        scholarship     numeric (3, 2),
+                        disabilities    text[],
+                        PRIMARY KEY (user_uid)
+                        );
+'''
+conn = psycopg2.connect(
+    host=HOST_NAME,
+    dbname=DATABASE,
+    user=USER_NAME,
+    password=PASSWORD,
+    port=PORT_ID
+)
+psycopg2.extras.register_uuid()
+cur = conn.cursor()
+cur.execute(TABLE)
+
+conn.commit()
+
+cur.close()
+conn.close()
