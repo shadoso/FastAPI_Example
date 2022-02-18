@@ -1,6 +1,5 @@
 from uuid import UUID
 from fastapi import FastAPI
-from fastapi import HTTPException
 from models import User
 from PostgreSQL import DataBase
 
@@ -29,12 +28,12 @@ async def show_users(user_uid: UUID):
 @app.delete("/college/delete/users/{user_id}")
 async def delete_users(user_uid: UUID):
     database = DataBase(user_uid)
-    user = database.query_user()
+    verify = database.query_user()
 
-    if user is not None:
+    if verify is not None:
         database.delete_user()
         database.close_db()
-        return f"User: {user.uid} has been removed"
+        return f"User: {user_uid} has been removed"
 
     else:
         database.close_db()
@@ -56,10 +55,16 @@ async def register_users(user: User):
         scholarship=user.scholarship,
         disabilities=user.disabilities
     )
-    database.register_user()
-    database.close_db()
+    verify = database.query_user()
 
-    return f"User: {user.uid} has been created"
+    if verify is None:
+        database.register_user()
+        database.close_db()
+        return f"User: {user.uid} has been created"
+
+    else:
+        database.close_db()
+        return f"The UUID: {user.uid} already have a owner"
 
 # @app.put("/college/update/info/{user_id}")
 # async def update_users(user_id: UUID, update: UpdateInfo):
