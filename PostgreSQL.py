@@ -44,7 +44,7 @@ INVALID = "User structures doesn't match with rules "
 
 class DataBase:
     def __init__(self,
-                 user_uid=None, name=None, gender=None, role=None, course=None, salary=None, monthly_payment=None,
+                 user_uid, name=None, gender=None, role=None, course=None, salary=None, monthly_payment=None,
                  scholarship=None, disabilities=None
                  ):
 
@@ -75,7 +75,8 @@ class DataBase:
 
     def salary(self):
         if self._role == Role.teacher or self._role == Role.coordinator:
-            if MAX_COURSE_AMOUNT <= len(self._course) >= MIN_COURSE_AMOUNT:
+            print(len(self._course))
+            if MIN_COURSE_AMOUNT <= len(self._course) <= MAX_COURSE_AMOUNT:
                 self._salary = len(self._course) * SALARY
 
     def monthly_payment(self):
@@ -121,7 +122,7 @@ class DataBase:
             self._course,
             self._salary,
             self._monthly_payment,
-            str(self._scholarship),
+            float(self._scholarship),
             self._disabilities
         ]
 
