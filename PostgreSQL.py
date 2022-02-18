@@ -9,9 +9,8 @@ DATABASE_PASSWORD = 'shadobot'
 PORT_ID = 5432
 
 # PostgreSQL commands
-UPDATE_USER_SALARY = 'UPDATE users SET salary = '
-WHERE_USER_UID = ' WHERE user_uid = '
-UPDATE_USER_MONTHLY_PAYMENT = 'UPDATE users SET monthly_payment = '
+QUERY_USER = 'SELECT * FROM users WHERE user_uid = %s'
+DELETE_USER = 'DELETE FROM users WHERE user_uid = %s'
 CREATE_USER = 'INSERT INTO users ' \
               '(user_uid, name, gender, role, course, salary, monthly_payment, scholarship, disabilities) ' \
               'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'
@@ -50,7 +49,7 @@ class DataBase:
                  ):
 
         # User data
-        self.__user_uid = user_uid
+        self.__user_uid = str(user_uid)  # Converting UUID to str might not be the best solution
         self._name = name
         self._gender = gender
         self._role = role
@@ -59,9 +58,6 @@ class DataBase:
         self._monthly_payment = monthly_payment
         self._scholarship = scholarship
         self._disabilities = disabilities
-
-        # Database name = varchar(56)
-        assert MAX_NAME_LENGTH >= len(self._name) >= MIN_NAME_LENGTH, MSG_LENGTH_LIMIT
 
         # DB connection
         self.conn = psycopg2.connect(
@@ -73,13 +69,12 @@ class DataBase:
         """
         :return: Close the database query
         """
+        self.conn.commit()
         self.cur.close()
         self.conn.close()
 
     def salary(self):
         if self._role == Role.teacher or self._role == Role.coordinator:
-            self._salary = None
-
             if MAX_COURSE_AMOUNT <= len(self._course) >= MIN_COURSE_AMOUNT:
                 self._salary = len(self._course) * SALARY
 
@@ -93,40 +88,50 @@ class DataBase:
 
         if self._role == Role.teacher or Role.coordinator:
             if NO_COURSE <= len(self._course) <= MAX_COURSE_AMOUNT:
+                self._salary = None
+                self._monthly_payment = None
                 return True
 
         if self._role == Role.student and len(self._course) == MIN_COURSE_AMOUNT:
+            self._salary = None
+            self._monthly_payment = None
             return True
 
         if self._role == Role.guest and self._course is None:
+            self._salary = None
+            self._monthly_payment = None
             return True
 
         else:
-            return False
+            raise INVALID
 
     def register_user(self):
         """
         :return: Append user to database
         """
-        if self.validate_user():
-            self.salary()
-            self.monthly_payment()
+        self.validate_user()
+        self.salary()
+        self.monthly_payment()
 
-            values = [
-                str(self.__user_uid),  # Converting UUID to str might not be the best solution
-                self._name,
-                self._gender,
-                self._role,
-                self._course,
-                self._salary,
-                self._monthly_payment,
-                self._scholarship,
-                self._disabilities
-            ]
+        values = [
+            self.__user_uid,
+            self._name,
+            self._gender,
+            self._role,
+            self._course,
+            self._salary,
+            self._monthly_payment,
+            str(self._scholarship),
+            self._disabilities
+        ]
 
-            self.cur.execute(CREATE_USER, values)
-            self.conn.commit()
-            return True
+        self.cur.execute(CREATE_USER, values)
+        return True
 
-        else:
-            raise INVALID
+    def query_user(self):
+        self.cur.execute(QUERY_USER, (self.__user_uid,))  # Why it needs to be in (something,) ??
+        user = self.cur.fetchall()
+        return None if len(user) == 0 else user
+
+    def delete_user(self):
+        self.cur.execute(DELETE_USER, (self.__user_uid,))  # Why it needs to be in (something,) ??

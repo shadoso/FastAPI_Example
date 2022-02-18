@@ -14,9 +14,31 @@ async def home():
     return {"I'm home": "Hi"}
 
 
-@app.get("/college/show/users")
-async def show_users():
-    return 0
+@app.get("/college/show/{user_id}")
+async def show_users(user_uid: UUID):
+    database = DataBase(user_uid)
+    user = database.query_user()
+
+    if user is None:
+        return f"The UUID: {user_uid} doesn't belong to any user."
+
+    else:
+        return user
+
+
+@app.delete("/college/delete/users/{user_id}")
+async def delete_users(user_uid: UUID):
+    database = DataBase(user_uid)
+    user = database.query_user()
+
+    if user is not None:
+        database.delete_user()
+        database.close_db()
+        return f"User: {user.uid} has been removed"
+
+    else:
+        database.close_db()
+        return f"The UUID: {user_uid} doesn't belong to any user."
 
 
 @app.post("/college/register/users")
@@ -37,7 +59,7 @@ async def register_users(user: User):
     database.register_user()
     database.close_db()
 
-    return f"User: {user.name} has been created"
+    return f"User: {user.uid} has been created"
 
 # @app.put("/college/update/info/{user_id}")
 # async def update_users(user_id: UUID, update: UpdateInfo):
@@ -55,14 +77,3 @@ async def register_users(user: User):
 #     )
 #
 #
-# @app.delete("/college/delete/users/{user_id}")
-# async def delete_users(user_id: UUID):
-#     for user in database:
-#         if user.id == user_id:
-#             database.remove(user)
-#             return f"User {user.name} has been removed"
-#
-#     raise HTTPException(
-#         status_code=NOT_FOUND,
-#         detail=f"The id {user_id} doesn't belong to any user"
-#     )
