@@ -55,3 +55,6 @@ class User(BaseModel):
 class UpdateInfo(BaseModel):
     role: Role
     course: List[Courses]
+    salary: Optional[float] = None
+    monthly_payment: Optional[float] = None
+    scholarship: Optional[Scholarship] = None
