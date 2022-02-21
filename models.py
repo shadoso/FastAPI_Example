@@ -1,7 +1,14 @@
+from PostgreSQL_Database import Base
+from sqlalchemy import Column, Numeric, String, Enum, ARRAY
+from sqlalchemy.dialects.postgresql import UUID
 from enum import Enum
-from uuid import UUID, uuid4
-from pydantic import BaseModel
 from typing import Optional, List
+
+LENGTH_NAME = 56
+PRECISION = 2
+SCALE = 8
+EMAIL = """Name + Role + Unique + @ChimeraCore.com
+Only users that are attached to college can have it"""
 
 
 class Gender(str, Enum):
@@ -40,21 +47,16 @@ class Disability(str, Enum):
     cognitive = "Cognitive impairment"
 
 
-class User(BaseModel):
-    uid: Optional[UUID] = uuid4()
-    name: str
-    gender: Gender
-    role: Role
-    course: Optional[List[Courses]] = None
-    salary: Optional[float] = None
-    monthly_payment: Optional[float] = None
-    scholarship: Optional[Scholarship] = None
-    disabilities: Optional[List[Disability]] = None
+class User(Base):
+    __tablename__ = "Users"
 
-
-class UpdateInfo(BaseModel):
-    role: Role
-    course: List[Courses]
-    salary: Optional[float] = None
-    monthly_payment: Optional[float] = None
-    scholarship: Optional[Scholarship] = None
+    uid: Column(UUID, nullable=False, primary_key=True)
+    name: Column(String(length=LENGTH_NAME), nullable=False)
+    email: Column(String, comment=EMAIL, nullable=True, unique=True)  # Check This
+    gender: Column(Enum(Gender), nullable=False)
+    role: Column(Enum(Role), nullable=False)
+    course: Column(ARRAY(Enum(Courses)), nullable=True)
+    salary: Column(Numeric(precision=PRECISION, scale=SCALE), nullable=True)
+    monthly_payment: Column(Numeric(precision=PRECISION, scale=SCALE), nullable=True)
+    scholarship: Column(Enum(Scholarship), nullable=True)
+    disabilities: Column(ARRAY(Enum(Disability)), nullable=True)
