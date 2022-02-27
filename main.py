@@ -1,84 +1,78 @@
-from uuid import UUID
+from fastapi import Depends
 from fastapi import FastAPI
-from models import User
-from PostgreSQL import DataBase
+from typing import Optional
+from uuid import uuid4
+from SQL.session import engine, database, Base
+from SQL import models
+from SQL.models import Role, Course, Enum
+from SQL import schemas
+from sqlalchemy.orm import Session
 
+EMPLOYEE = [Role.admin, Role.coordinator, Role.staff, Role.teacher]
 NOT_FOUND = 404
+COLLEGE_EMAIL = "@ChimeraCore.com"
 
+Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 
-@app.get("/")
+@app.get("/home")
 async def home():
     return {"I'm home": "Hi"}
 
 
-@app.get("/college/show/{user_id}")
-async def show_users(user_uid: UUID):
-    database = DataBase(user_uid)
-    user = database.query_user()
+@app.get("/home/ChimeraCore/show/all/{role}")
+async def show_users(data: Session = Depends(database),
+                     role: Role = str
+                     ):
+    user = role
 
-    if user is None:
-        return f"The UUID: {user_uid} doesn't belong to any user."
+    if user == Role.student:
+        student = data.query(models.Student).all()
+        return {f"{user.value}s": student}
 
-    else:
-        return user
+    if user in EMPLOYEE:
+        employee = data.query(models.Employee).all()
+        return {f"{user.value}s": employee}
 
-
-@app.delete("/college/delete/users/{user_id}")
-async def delete_users(user_uid: UUID):
-    database = DataBase(user_uid)
-    verify = database.query_user()
-
-    if verify is not None:
-        database.delete_user()
-        database.close_db()
-        return f"User: {user_uid} has been removed"
-
-    else:
-        database.close_db()
-        return f"The UUID: {user_uid} doesn't belong to any user."
+    if user == Role.guest:
+        guest = data.query(models.Guest).all()
+        return {f"{user.value}s": guest}
 
 
-@app.post("/college/register/users")
-async def register_users(user: User):
-    user.name.capitalize()
+@app.post("/home/ChimeraCore/create/{role}")
+async def create_user(post: schemas.Post, role: Role,
+                      code: str = str(uuid4())[::5],
+                      data: Session = Depends(database)
+                      ):
+    unique = str(uuid4())[11::5]
+    college_email = post.name + role.value + unique + COLLEGE_EMAIL
+    user = role
+    # code = password
 
-    database = DataBase(
-        user_uid=user.uid,
-        name=user.name,
-        gender=user.gender,
-        role=user.role,
-        course=user.course,
-        salary=user.salary,
-        monthly_payment=user.monthly_payment,
-        scholarship=user.scholarship,
-        disabilities=user.disabilities
-    )
-    verify = database.query_user()
+    if user == Role.student:
+        student = models.Student(**post.dict(), email=college_email, password=code, role=user)
 
-    if verify is None:
-        database.register_user()
-        database.close_db()
-        return f"User: {user.uid} has been created"
+        data.add(student)
+        data.commit()
+        data.refresh(student)
 
-    else:
-        database.close_db()
-        return f"The UUID: {user.uid} already have a owner"
+        return {f"{user.value}": student.email}
 
-# @app.put("/college/update/info/{user_id}")
-# async def update_users(user_id: UUID, update: UpdateInfo):
-#     for user in database:
-#
-#         if user.id == user_id:
-#             backup = user.copy()
-#             user.role = update.role
-#             user.course = update.course
-#             return "Old", backup, "New", user
-#
-#     raise HTTPException(
-#         status_code=404,
-#         detail=f"The id {user_id} doesn't belong to any user"
-#     )
-#
-#
+    if user in EMPLOYEE:
+        employee = models.Employee(**post.dict(), email=college_email, password=code, role=user)
+
+        data.add(employee)
+        data.commit()
+        data.refresh(employee)
+
+        return {f"{user.value}": employee.email}
+
+    if user == Role.guest:
+        guest = models.Guest(**post.dict(), email=college_email, password=code, role=user)
+
+        data.add(guest)
+        data.commit()
+        data.refresh(guest)
+
+        return {f"{user.value}": guest.email}
