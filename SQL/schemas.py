@@ -16,8 +16,8 @@ class Post(BaseModel):
 
 
 class PostEmployee(Post):
-    role: Role
     course: Optional[Set[Course]] = None
+
     # salary: float
 
     class Config:
@@ -40,3 +40,8 @@ class PostGuest(Post):
 
     class Config:
         orm_mode = True
+
+
+class Login(BaseModel):
+    email: str
+    password: str
