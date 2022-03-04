@@ -1,11 +1,12 @@
 from fastapi import FastAPI
 from Routers import show, post, access
+from SQL.session import Base, engine
 
 
 PATH = [show, post, access]
 COLLEGE_EMAIL = "@ChimeraCore.com"
 
-# Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 for rout in PATH:

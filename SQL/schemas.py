@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional, Set
-from SQL.types import Gender, Role, Access, Disability, Course, Scholarship, LifeTime
+from SQL.types import Gender, Disability, Course
 
 
 class Post(BaseModel):
@@ -27,16 +27,6 @@ class PostEmployee(Post):
 class PostStudent(Post):
     course: Course
     # monthly_payment: float
-    scholarship: Scholarship
-
-    class Config:
-        orm_mode = True
-
-
-class PostGuest(Post):
-    description: str
-    access: Access
-    life_time: LifeTime
 
     class Config:
         orm_mode = True

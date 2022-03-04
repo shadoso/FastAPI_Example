@@ -16,37 +16,32 @@ class Role(Enum):
 
 
 class Course(Enum):
-    cs = "Computer Science"
-    ds = "Data Science"
-    anth = "Anthropology"
-    bioeng = "Bioengineering"
+    com_sci = "Computer Science"
+    dat_sci = "Data Science"
+    ant = "Anthropology"
+    bio_eng = "Bioengineering"
     ling = "Linguistics"
-    psyc = "Psychology"
-
-
-class Scholarship(Enum):
-    full = 1.00
-    half = 0.50
-    quarter = 0.25
-    none = 0.00
+    psych = "Psychology"
 
 
 class Access(Enum):
     classroom = "Classroom"
-    lecture = "Lecture"
-    cafeteria = "Cafeteria"
+    hall = "Lecture Hall"
+    server = "Server Room"
+    computer = "Computer Lab"
+    bio_eng = "Bioengineering Lab"
+    library = "Library Hall"
 
 
 class Disability(Enum):
-    mobility = "Mobility impairment"
-    eyesight = "Eyesight impairment"
-    hearing = "Hearing impairment"
-    physical = "Physical impairment"
-    cognitive = "Cognitive impairment"
+    mobility = "Mobility Impairment"
+    eyesight = "Eyesight Impairment"
+    hearing = "Hearing Impairment"
+    physical = "Physical Impairment"
+    cognitive = "Cognitive Impairment"
 
 
-class LifeTime(Enum):
-    daylong = "Daylong"
-    monthlong = "Monthlong"
-    yearlong = "Yearlong"
-    permanent = "Permanent"
+class Payment(Enum):
+    salary = "Salary"
+    tuition = "College Tuition"
+    lecture = "Lecture Fee"
