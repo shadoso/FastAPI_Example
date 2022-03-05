@@ -1,6 +1,6 @@
 import sqlalchemy
 from sqlalchemy.orm import relationship
-from SQL.types import Gender, Role, Disability, Payment
+from SQL.types import Gender, Role, Disability, Payment, Access
 from sqlalchemy.sql.functions import now
 from sqlalchemy import Column, Numeric, String, Enum, ARRAY, DateTime, ForeignKey, Boolean, Integer
 from sqlalchemy.dialects.postgresql import UUID
@@ -21,11 +21,10 @@ class Users(Base):
     fullname = Column(String, nullable=False)
     gender = Column(Enum(Gender), nullable=False)
     role = Column(Enum(Role), nullable=False)
-    email = Column(String, nullable=False)
+    access = Column(ARRAY(Enum(Access)), nullable=True)
+    email = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
     monetary = relationship("Monetary")
-    #  Project need to be restructured
-    #  Access
     disabilities = Column(ARRAY(Enum(Disability)), nullable=True)
     created_date = Column(DateTime(timezone=True), server_default=now())
 
@@ -35,22 +34,22 @@ class Monetary(Base):
 
     user_fk = Column(UUID, ForeignKey(Users.uuid, ondelete="CASCADE"), primary_key=True)
     activity = Column(Boolean, default=False, nullable=False)
-    payment = Column(Enum(Payment), nullable=False)
-    exchange = Column(Numeric(precision=PRECISION, scale=SCALE), nullable=True)
+    archetype = Column(Enum(Payment), nullable=False)
+    payment = Column(Numeric(precision=PRECISION, scale=SCALE), nullable=True)
 
 
 # class Project(Base):
 #     __tablename__ = 'project'
 #
-#     project_id = Column(Integer, primary_key=True, nullable=False)
+#     project_id = Column(Integer, autoincrement=True, primary_key=True, nullable=False)
 #     author = Column(String, ForeignKey(Users.fullname, ondelete="CASCADE"))
-#     author_email = Column(String, ForeignKey(Users.email, ondelete="CASCADE"))
 #     title = Column(String, nullable=False)
 #     content = Column(String, nullable=False)
 #     approved = Column(Boolean, default=False, nullable=False)
+#     owner = relationship("Users")
+#     #  Create on update
 #     created_date = Column(DateTime(timezone=True), server_default=now())
-#
-#
+
 # class Classroom(Base):
 #     __tablename__ = 'classroom'
 #      Will receive (teacher, student or coordinator)uuid
