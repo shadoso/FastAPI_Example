@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
-from Utility import hashing, oauth2
-from SQL.session import database
 from SQL.models import Users
-from SQL.schemas import Login, Token
+from SQL.schemas import Token
+from SQL.session import database
 from sqlalchemy.orm import Session
+from Utility import hashing, oauth2
 
 router = APIRouter(
     prefix="/ChimeraCore",
@@ -32,8 +32,13 @@ async def login(
             detail="Invalid Credentials"
         )
 
-    access_token = oauth2.generate_token(data={"uuid": user_info.uuid,
-                                               "role": user_info.role.value})
+    access_token = oauth2.generate_token(
+        data={
+            "uuid": user_info.uuid,
+            "fullname": user_info.fullname,
+            "role": user_info.role.value
+        }
+    )
 
     return {"access_token": access_token,
             "token_type": "bearer"}
