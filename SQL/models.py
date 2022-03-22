@@ -1,10 +1,10 @@
-import sqlalchemy
-from sqlalchemy.orm import relationship
-from SQL.types import Gender, Role, Disability, Payment, Access
-from sqlalchemy.sql.functions import now
-from sqlalchemy import Column, Numeric, String, Enum, ARRAY, DateTime, ForeignKey, Boolean, Integer
-from sqlalchemy.dialects.postgresql import UUID
 from SQL.session import Base
+from SQL.types import Access, Disability, Gender, Payment, Role
+from sqlalchemy import ARRAY, Boolean, Column, DateTime, Enum, ForeignKey, Numeric, String
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
+from sqlalchemy.sql.functions import now
+import sqlalchemy
 
 LENGTH_NAME = 25
 LENGTH_SURNAME = 35
