@@ -1,9 +1,9 @@
 from fastapi import FastAPI
-from Routers import show, create, login
+from Routers import create, login, show
 from SQL.session import Base, engine
 
 
-PATH = [show, create, login]
+PATH = [create, login, show]
 
 Base.metadata.create_all(bind=engine)
 app = FastAPI()
