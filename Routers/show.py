@@ -1,10 +1,10 @@
-from fastapi import Depends
 from fastapi import APIRouter
-from SQL.session import database
-from Utility import oauth2
+from fastapi import Depends
 from SQL import models
 from SQL.models import Role
+from SQL.session import database
 from sqlalchemy.orm import Session
+from Utility import oauth2
 
 router = APIRouter(
     prefix="/ChimeraCore/show",
@@ -31,6 +31,7 @@ async def show_users(
         token: str = Depends(oauth2.current_user),
         role: Role = str
 ):
+
     return data.query(models.Users).filter_by(role=role).all()
 
 
