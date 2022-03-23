@@ -51,23 +51,16 @@ async def create_user(
 
     post.name = usr_name[0]["Name"]
     post.surname = usr_name[0]["Surname"]
-    post.fullname = usr_name[0]["Fullname"]
     post.password = encrypt(post.password)
 
     new_user = models.Users(
         **post.dict(),
-        role=role
+        role=role,
+        fullname=usr_name[0]["Fullname"]
     )
 
     data.add(new_user)
     data.commit()
     data.refresh(new_user)
-
-    monetary_table = models.Monetary(user_fk=new_user.uuid,
-                                     archetype=PAYMENT_TYPE[role])
-
-    data.add(monetary_table)
-    data.commit()
-    data.refresh(monetary_table)
 
     return new_user

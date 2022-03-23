@@ -18,7 +18,7 @@ async def login(
         data: Session = Depends(database)
 ):
     # Query for an email in the database
-    user_info = data.query(Users).filter(Users.email == credential.username).first()
+    user_info = data.query(Users).filter(Users.username == credential.username).first()
 
     if not user_info:
         raise HTTPException(

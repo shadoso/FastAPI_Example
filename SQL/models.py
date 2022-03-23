@@ -22,7 +22,7 @@ class Users(Base):
     gender = Column(Enum(Gender), nullable=False)
     role = Column(Enum(Role), nullable=False)
     access = Column(ARRAY(Enum(Access)), nullable=True)
-    email = Column(String, unique=True, nullable=False)
+    username = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
     monetary = relationship("Monetary")
     disabilities = Column(ARRAY(Enum(Disability)), nullable=True)

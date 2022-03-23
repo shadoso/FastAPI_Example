@@ -1,6 +1,6 @@
 from string import ascii_letters, digits, punctuation
 
-ALLOWED = set(ascii_letters + "áÁéÉíÍóÓçÇ ")
+ALLOWED = set(ascii_letters + "áÁéÉíÍóÓöçÇ ")
 MATCH = 1
 MAX_PASSWORD = 16
 MIN_LENGTH = 3

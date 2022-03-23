@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from SQL.types import Disability, Gender, Role
+from SQL.types import Disability, Gender, Role, Payment
 from typing import Optional, Set
 
 
@@ -7,11 +7,11 @@ class Post(BaseModel):
     # uuid: UUID
     name: str
     surname: str
-    fullname: str
+    # fullname: Optional[str] = None
     gender: Gender
     # role: Role
     # access: Optional[Set[Access]]
-    email: str = "defaultemail@ChimeraCore.com"
+    username: str = "defaultemail@ChimeraCore.com"
     password: str
     # monetary: relationship("Monetary")
     disabilities: Optional[Set[Disability]]
@@ -26,9 +26,19 @@ class Login(BaseModel):
         orm_mode = True
 
 
+class UserStatus(BaseModel):
+    activity: bool
+    archetype: Payment
+    payment: float
+
+    class Config:
+        orm_mode = True
+
+
 class ShowUser(BaseModel):
+    fullname: str
     role: Role
-    email: str
+    username: str
 
     class Config:
         orm_mode = True
