@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
-from SQL.models import Users
+from SQL.models import Users, Monetary
 from SQL.schemas import Token
 from SQL.session import database
 from sqlalchemy.orm import Session
@@ -12,6 +12,7 @@ router = APIRouter(
 )
 
 
+#   response_model=Token
 @router.post("/login", response_model=Token)
 async def login(
         credential: OAuth2PasswordRequestForm = Depends(),
@@ -32,11 +33,15 @@ async def login(
             detail="Invalid Credentials"
         )
 
+    # It might be possible to get this value from user_info.context, I just don't know how
+    user_status = data.query(Monetary).filter(user_info.uuid == Monetary.user_fk).first()
+
     access_token = oauth2.generate_token(
         data={
             "uuid": user_info.uuid,
+            "status": user_status.status,
             "fullname": user_info.fullname,
-            "role": user_info.role.value
+            "role": user_info.role.value,
         }
     )
 
