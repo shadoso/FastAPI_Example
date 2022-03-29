@@ -1,6 +1,7 @@
 from Config.config import settings as env
 from datetime import datetime, timedelta
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException
+from fastapi import status as error
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from SQL.schemas import Role, TokenData
@@ -29,13 +30,14 @@ def check_login_token(token: str, credentials_exception):
         info = jwt.decode(token=token, key=env.OATH_SECRET_KEY, algorithms=[env.ALGORITHM])
 
         uuid: str = info.get("uuid")
+        status: bool = info.get("status")
         fullname: str = info.get("fullname")
         role: Role = info.get("role")
 
         if uuid is None or role is None or fullname is None:
             return credentials_exception
 
-        token_data = TokenData(uuid=uuid, fullname=fullname, role=role)
+        token_data = TokenData(uuid=uuid, status=status, fullname=fullname, role=role)
 
     except JWTError:
         raise credentials_exception
@@ -45,7 +47,7 @@ def check_login_token(token: str, credentials_exception):
 
 def current_user(token: str = Depends(OAUTH_SCHEME)):
     credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
+        status_code=error.HTTP_401_UNAUTHORIZED,
         detail="Can't validate credentials",
         headers={"WWW-Authenticate": "Bearer"}
     )
