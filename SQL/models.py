@@ -1,5 +1,5 @@
 from SQL.session import Base
-from SQL.types import Access, Disability, Gender, Payment, Role
+from SQL.types import Access, Disability, Gender, Exchange, Role
 from sqlalchemy import ARRAY, Boolean, Column, DateTime, Enum, ForeignKey, Numeric, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
@@ -22,9 +22,10 @@ class Users(Base):
     gender = Column(Enum(Gender), nullable=False)
     role = Column(Enum(Role), nullable=False)
     access = Column(ARRAY(Enum(Access)), nullable=True)
+    email = Column(String, nullable=False, unique=True)
     username = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
-    monetary = relationship("Monetary")
+    context = relationship("Monetary")
     disabilities = Column(ARRAY(Enum(Disability)), nullable=True)
     created_date = Column(DateTime(timezone=True), server_default=now())
 
@@ -33,8 +34,8 @@ class Monetary(Base):
     __tablename__ = 'monetary'
 
     user_fk = Column(UUID, ForeignKey(Users.uuid, ondelete="CASCADE"), primary_key=True)
-    activity = Column(Boolean, default=False, nullable=False)
-    archetype = Column(Enum(Payment), nullable=False)
+    status = Column(Boolean, nullable=False)
+    category = Column(Enum(Exchange), nullable=False)
     payment = Column(Numeric(precision=PRECISION, scale=SCALE), nullable=True)
 
 
@@ -46,7 +47,6 @@ class Monetary(Base):
 #     title = Column(String, nullable=False)
 #     content = Column(String, nullable=False)
 #     approved = Column(Boolean, default=False, nullable=False)
-#     owner = relationship("Users")
 #     #  Create on update
 #     created_date = Column(DateTime(timezone=True), server_default=now())
 

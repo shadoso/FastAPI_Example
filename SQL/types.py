@@ -41,7 +41,7 @@ class Disability(Enum):
     cognitive = "Cognitive Impairment"
 
 
-class Payment(Enum):
+class Exchange(Enum):
     salary = "Salary"
     tuition = "College Tuition"
     lecture = "Lecture Fee"

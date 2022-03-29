@@ -3,19 +3,19 @@ from fastapi import Depends
 from fastapi import HTTPException, status
 from SQL import models
 from SQL import schemas
-from SQL.models import Payment, Role
+from SQL.models import Exchange, Role
 from SQL.session import database
 from sqlalchemy.orm import Session
 from Utility.hashing import encrypt
 from Utility.many_checks import valid_name, valid_pass
 
 PAYMENT_TYPE = {
-    Role.student: Payment.tuition,
-    Role.guest: Payment.lecture,
-    Role.admin: Payment.salary,
-    Role.coordinator: Payment.salary,
-    Role.teacher: Payment.salary,
-    Role.staff: Payment.salary,
+    Role.student: Exchange.tuition,
+    Role.guest: Exchange.lecture,
+    Role.admin: Exchange.salary,
+    Role.coordinator: Exchange.salary,
+    Role.teacher: Exchange.salary,
+    Role.staff: Exchange.salary,
 }
 DETAIL = 1
 
@@ -30,7 +30,7 @@ router = APIRouter(
              response_model=schemas.ShowUser
              )
 async def create_user(
-        post: schemas.Post,
+        post: schemas.CreateUser,
         role: Role,
         data: Session = Depends(database)
 ):
@@ -59,6 +59,11 @@ async def create_user(
         fullname=usr_name[0]["Fullname"]
     )
 
+    new_user.context.append(models.Monetary(
+        category=PAYMENT_TYPE[role],
+        payment=0.00,
+        status=False
+    ))
     data.add(new_user)
     data.commit()
     data.refresh(new_user)

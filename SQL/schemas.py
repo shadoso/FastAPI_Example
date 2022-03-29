@@ -1,35 +1,28 @@
-from pydantic import BaseModel
-from SQL.types import Disability, Gender, Role, Payment
-from typing import Optional, Set
-
-
-class Post(BaseModel):
-    # uuid: UUID
-    name: str
-    surname: str
-    # fullname: Optional[str] = None
-    gender: Gender
-    # role: Role
-    # access: Optional[Set[Access]]
-    username: str = "defaultemail@ChimeraCore.com"
-    password: str
-    # monetary: relationship("Monetary")
-    disabilities: Optional[Set[Disability]]
-    # created_date: datetime
+from pydantic import BaseModel, EmailStr
+from SQL.types import Disability, Gender, Role, Exchange
+from typing import Optional, Set, List
+from uuid import UUID
 
 
 class Login(BaseModel):
-    username: str
+    username: str = "DefaultUser"
     password: str
+
+
+class User(BaseModel):
+    name: str
+    surname: str
+    gender: Gender
 
     class Config:
         orm_mode = True
 
 
-class UserStatus(BaseModel):
-    activity: bool
-    archetype: Payment
-    payment: float
+class CreateUser(User):
+    email: EmailStr
+    username: str = "DefaultUser"
+    password: str
+    disabilities: Optional[Set[Disability]]
 
     class Config:
         orm_mode = True
@@ -38,7 +31,23 @@ class UserStatus(BaseModel):
 class ShowUser(BaseModel):
     fullname: str
     role: Role
-    username: str
+
+    class Config:
+        orm_mode = True
+
+
+class UserStatus(BaseModel):
+    status: bool = False
+    category: Exchange
+    payment: float = 0.00
+
+    class Config:
+        orm_mode = True
+
+
+class SecretShow(Login, ShowUser):
+    uuid: UUID
+    context: List[UserStatus]
 
     class Config:
         orm_mode = True
@@ -50,6 +59,7 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
-    uuid: str
+    uuid: UUID
+    status: bool
     fullname: str
     role: Role

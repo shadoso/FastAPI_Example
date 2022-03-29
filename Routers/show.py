@@ -1,7 +1,7 @@
 from typing import List
 from fastapi import APIRouter
-from fastapi import Depends
-from SQL.schemas import ShowUser
+from fastapi import Depends, HTTPException, status
+from SQL.schemas import ShowUser, SecretShow
 from SQL import models
 from SQL.models import Role
 from SQL.session import database
@@ -13,33 +13,19 @@ router = APIRouter(
     tags=["Show"]
 )
 
-# EMPLOYEE = models.Employee
-# STUDENT = models.Student
-# GUEST = models.Guest
-#
-# TABLE = {
-#     Role.admin: EMPLOYEE,
-#     Role.staff: EMPLOYEE,
-#     Role.coordinator: EMPLOYEE,
-#     Role.teacher: EMPLOYEE,
-#     Role.student: STUDENT,
-#     Role.guest: GUEST
-# }
-
 
 @router.get("/all/{role}", response_model=List[ShowUser])
 async def show_users(
         data: Session = Depends(database),
-        token: str = Depends(oauth2.current_user),
+        token: object = Depends(oauth2.current_user),
         role: Role = str
 ):
+    if token.status is False:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Yor status in the college is disabled"
+        )
 
-    return data.query(models.Users).filter_by(role=role).all()
+    result = data.query(models.Users).filter_by(role=role).all()
 
-
-# @router.get("/show/{role}")
-# async def show_users(
-#         data: Session = Depends(database),
-#         role: Role = str
-# ):
-#     return data.query(TABLE[role]).filter_by(role=role).all()
+    return result
